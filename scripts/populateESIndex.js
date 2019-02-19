@@ -1,3 +1,5 @@
+const Bluebird = require('bluebird');
+
 const elasticClient = require('./../elasticClient.js').getClient();
 const fs = require('fs');
 const argv = require('minimist')(process.argv.slice(2));
@@ -39,19 +41,19 @@ function readAndParseData() {
 }
 
 readAndParseData().then(() => {
-    Object.keys(esData).forEach((key) => {
-        elasticClient.index({
+    Bluebird.map(Object.keys(esData), (key) => {
+        return elasticClient.index({
             index: INDEX,
             id: key,
             type: '_doc',
             body: esData[key],
-        }).then((result) => {
-            if (logging === 'debug') {
-                console.log(result);
-            }
-        }).catch((err) => {
-            console.log(err)
-            throw err;
         });
+    }, {concurrency: 10}).then((result) => {
+        if (logging === 'debug') {
+            console.log(result);
+        }
+    }).catch((err) => {
+        console.log(err)
+        throw err;
     });
 });

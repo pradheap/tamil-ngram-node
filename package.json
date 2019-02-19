@@ -17,6 +17,7 @@
     "restify-cors-middleware": "^1.1.1"
   },
   "devDependencies": {
+    "bluebird": "^3.5.3",
     "minimist": "^1.2.0"
   }
 }
